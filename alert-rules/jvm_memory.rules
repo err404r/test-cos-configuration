@@ -1,0 +1,18 @@
+groups:
+- name: Custom JVM Rules
+  rules:
+    - alert: Custom JVM Usage
+      annotations:
+        description: ' The broker {{ $labels.instance }} has high memory usage ({{ $value
+          }}>80%) for more than 1 minutes.'
+        summary: 'Broker {{ $labels.instance }} :: Critical :: Heap memory usage is
+          {{ $value }}% '
+      expr: (sum without(area)(jvm_memory_bytes_used{juju_application="kafka"})
+          / sum without(area)(jvm_memory_bytes_max{juju_application="kafka"})) * 100 > 80
+      for: 10m
+      labels:
+        juju_application: kafka
+        juju_charm: kafka
+        juju_model: {{ $labels.juju_model }}
+        juju_model_uuid: {{ $labels.juju_model_uuid }}
+        severity: critical
